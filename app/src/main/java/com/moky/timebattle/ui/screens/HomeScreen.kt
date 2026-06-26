@@ -51,8 +51,7 @@ import com.moky.timebattle.ui.components.SectionLabel
 import com.moky.timebattle.ui.components.TimerBar
 import com.moky.timebattle.ui.components.icons.bellIcon
 import com.moky.timebattle.ui.components.icons.groupIcon
-import com.moky.timebattle.ui.components.icons.taskIcon
-import com.moky.timebattle.ui.components.icons.tradeIcon
+import com.moky.timebattle.ui.components.icons.syncIcon
 import com.moky.timebattle.ui.components.icons.userIcon
 import com.moky.timebattle.ui.theme.AbyssBlack
 import com.moky.timebattle.ui.theme.DeepGrey
@@ -68,11 +67,10 @@ import com.moky.timebattle.util.VibrationHelper
 fun HomeScreen(
     viewModel: AppViewModel,
     onShowMessage: (String) -> Unit,
-    onNavigateToTasks: () -> Unit,
     onTaskClick: (String) -> Unit,
     onNavigateToNotifications: () -> Unit,
-    onNavigateToTrade: () -> Unit,
     onNavigateToAlliance: () -> Unit,
+    onNavigateToSync: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -88,15 +86,14 @@ fun HomeScreen(
                 onShowMessage("今日已签到")
             }
         },
-        onNavigateToTasks = onNavigateToTasks,
         onTaskClick = { taskId ->
             viewModel.completeTask(taskId)
             VibrationHelper.vibrateSuccess(context)
             onShowMessage("任务完成，奖励已到账")
         },
         onNavigateToNotifications = onNavigateToNotifications,
-        onNavigateToTrade = onNavigateToTrade,
         onNavigateToAlliance = onNavigateToAlliance,
+        onNavigateToSync = onNavigateToSync,
         modifier = modifier
     )
 }
@@ -105,11 +102,10 @@ fun HomeScreen(
 private fun HomeContent(
     state: AppState,
     onCheckIn: () -> Unit,
-    onNavigateToTasks: () -> Unit,
     onTaskClick: (String) -> Unit,
     onNavigateToNotifications: () -> Unit,
-    onNavigateToTrade: () -> Unit,
     onNavigateToAlliance: () -> Unit,
+    onNavigateToSync: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val user = state.user
@@ -242,15 +238,9 @@ private fun HomeContent(
             )
             ActionItem(
                 modifier = Modifier.weight(1f),
-                icon = { Icon(taskIcon(), null, tint = MutedWhite, modifier = Modifier.size(20.dp)) },
-                label = "任务",
-                onClick = onNavigateToTasks
-            )
-            ActionItem(
-                modifier = Modifier.weight(1f),
-                icon = { Icon(tradeIcon(), null, tint = MutedWhite, modifier = Modifier.size(20.dp)) },
-                label = "交易",
-                onClick = onNavigateToTrade
+                icon = { Icon(syncIcon(), null, tint = MutedWhite, modifier = Modifier.size(20.dp)) },
+                label = "同步",
+                onClick = onNavigateToSync
             )
             ActionItem(
                 modifier = Modifier.weight(1f),
@@ -330,11 +320,10 @@ private fun HomeContentPreview() {
         HomeContent(
             state = AppState(user = User(isLoggedIn = true)),
             onCheckIn = {},
-            onNavigateToTasks = {},
             onTaskClick = {},
             onNavigateToNotifications = {},
-            onNavigateToTrade = {},
-            onNavigateToAlliance = {}
+            onNavigateToAlliance = {},
+            onNavigateToSync = {}
         )
     }
 }

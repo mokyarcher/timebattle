@@ -144,20 +144,17 @@ fun AppNavigation(
                 HomeScreen(
                     viewModel = viewModel,
                     onShowMessage = showMessage,
-                    onNavigateToTasks = {
-                        navController.navigate(Screen.Tasks.route)
-                    },
                     onTaskClick = { taskId ->
                         viewModel.completeTask(taskId)
                     },
                     onNavigateToNotifications = {
                         navController.navigate(Screen.Notifications.route)
                     },
-                    onNavigateToTrade = {
-                        navController.navigate(Screen.Trade.route)
-                    },
                     onNavigateToAlliance = {
                         navController.navigate(Screen.Alliance.route)
+                    },
+                    onNavigateToSync = {
+                        showMessage("同步功能即将开放")
                     }
                 )
             }

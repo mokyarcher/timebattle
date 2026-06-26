@@ -278,6 +278,29 @@ fun infoIcon(color: Color = Color.White): ImageVector = ImageVector.Builder(
     }
 }.build()
 
+fun syncIcon(color: Color = Color.White): ImageVector = ImageVector.Builder(
+    name = "Sync",
+    defaultWidth = 24.dp,
+    defaultHeight = 24.dp,
+    viewportWidth = 24f,
+    viewportHeight = 24f
+).apply {
+    path(
+        fill = SolidColor(Color.Transparent),
+        stroke = SolidColor(color),
+        strokeLineWidth = DefaultStrokeWidth,
+        strokeLineCap = StrokeCap.Round,
+        strokeLineJoin = StrokeJoin.Round
+    ) {
+        moveTo(21.5f, 5f); verticalLineTo(9f); horizontalLineTo(17.5f)
+        moveTo(2.5f, 19f); verticalLineTo(15f); horizontalLineTo(6.5f)
+        moveTo(4.24f, 9.75f)
+        arcTo(7f, 7f, 0f, false, true, 15.66f, 5.4f); lineTo(18.5f, 8.5f)
+        moveTo(5.5f, 15.5f); lineTo(8.34f, 18.6f)
+        arcTo(7f, 7f, 0f, false, false, 19.76f, 14.25f)
+    }
+}.build()
+
 fun logoIcon(size: Float = 96f, color: Color = Color.White): ImageVector = ImageVector.Builder(
     name = "Logo",
     defaultWidth = size.dp,
