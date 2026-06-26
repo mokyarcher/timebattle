@@ -162,9 +162,6 @@ fun AppNavigation(
                 TasksScreen(
                     viewModel = viewModel,
                     onShowMessage = showMessage,
-                    onBack = {
-                        navController.popBackStack()
-                    },
                     onPublishTask = {
                         navController.navigate(Screen.PublishTask.route)
                     }
