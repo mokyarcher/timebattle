@@ -103,7 +103,10 @@ private fun TasksContent(
         // Title
         Text(
             text = "任务中心",
-            style = MaterialTheme.typography.headlineMedium.copy(fontSize = 20.sp),
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontFamily = MaterialTheme.typography.displayMedium.fontFamily,
+                fontSize = 16.sp
+            ),
             modifier = Modifier.padding(top = 14.dp)
         )
 

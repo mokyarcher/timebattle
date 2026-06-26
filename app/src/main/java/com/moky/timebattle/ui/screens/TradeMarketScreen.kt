@@ -115,8 +115,11 @@ private fun TradeMarketContent(
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = "时间交易",
-            style = MaterialTheme.typography.headlineMedium.copy(fontSize = 22.sp),
+            text = "交易中心",
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontFamily = MaterialTheme.typography.displayMedium.fontFamily,
+                fontSize = 16.sp
+            ),
             modifier = Modifier.padding(top = 14.dp)
         )
         Text(

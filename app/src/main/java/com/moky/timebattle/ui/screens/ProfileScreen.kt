@@ -79,7 +79,10 @@ private fun ProfileContent(
     ) {
         Text(
             text = "我的",
-            style = MaterialTheme.typography.headlineMedium.copy(fontSize = 22.sp),
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontFamily = MaterialTheme.typography.displayMedium.fontFamily,
+                fontSize = 16.sp
+            ),
             modifier = Modifier.padding(top = 14.dp)
         )
 
