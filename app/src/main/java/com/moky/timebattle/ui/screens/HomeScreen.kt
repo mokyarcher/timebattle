@@ -168,13 +168,15 @@ private fun HomeContent(
                     tint = MutedWhite,
                     modifier = Modifier.size(18.dp)
                 )
-                Box(
-                    modifier = Modifier
-                        .size(5.dp)
-                        .background(LifeRed, RoundedCornerShape(2.5.dp))
-                        .align(Alignment.TopEnd)
-                        .padding(end = 4.dp, top = 4.dp)
-                )
+                if (state.notifications.any { !it.isRead }) {
+                    Box(
+                        modifier = Modifier
+                            .size(5.dp)
+                            .background(LifeRed, RoundedCornerShape(2.5.dp))
+                            .align(Alignment.TopEnd)
+                            .padding(end = 4.dp, top = 4.dp)
+                    )
+                }
             }
         }
 
