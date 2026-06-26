@@ -132,19 +132,6 @@ private fun HomeContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .border(1.dp, StrokeRed, RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = userIcon(),
-                    contentDescription = "Avatar",
-                    tint = LifeRed,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
             Text(
                 text = "管理局",
                 style = MaterialTheme.typography.titleMedium.copy(
