@@ -124,7 +124,7 @@ private fun TasksContent(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxSize()
-                        .background(if (selected) LifeRed else Color.Transparent)
+                        .background(if (selected) AbyssBlack else Color.Transparent)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = ripple(),
@@ -135,7 +135,7 @@ private fun TasksContent(
                     Text(
                         text = title,
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = if (selected) MutedWhite else DimWhite,
+                            color = if (selected) LifeRed else DimWhite,
                             fontSize = 13.sp
                         )
                     )
