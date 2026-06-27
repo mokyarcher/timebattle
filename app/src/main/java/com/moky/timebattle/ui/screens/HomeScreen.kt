@@ -1,11 +1,13 @@
 package com.moky.timebattle.ui.screens
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,14 +32,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import com.moky.timebattle.data.AppViewModel
 import com.moky.timebattle.data.model.AppState
 import com.moky.timebattle.data.model.User
@@ -266,18 +272,42 @@ private fun SignInTab(
 ) {
     val today = remember { LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) }
     val checkedInToday = lastCheckInDate == today
+    val pressProgress = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    val iconColor = if (checkedInToday) {
+        MutedWhite
+    } else {
+        lerp(MutedWhite, LifeRed, pressProgress.value)
+    }
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(CarbonGrey, RoundedCornerShape(14.dp))
             .border(1.dp, StrokeLight, RoundedCornerShape(14.dp))
-            .clickable(
-                enabled = !checkedInToday,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(),
-                onClick = onCheckIn
-            )
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        if (checkedInToday) return@detectTapGestures
+                        scope.launch {
+                            pressProgress.animateTo(
+                                targetValue = 1f,
+                                animationSpec = tween(durationMillis = 1200)
+                            )
+                        }
+                        val released = tryAwaitRelease()
+                        if (released && pressProgress.value >= 0.95f) {
+                            onCheckIn()
+                        }
+                        scope.launch {
+                            pressProgress.animateTo(
+                                targetValue = 0f,
+                                animationSpec = tween(durationMillis = 200)
+                            )
+                        }
+                    }
+                )
+            }
             .padding(vertical = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -285,12 +315,12 @@ private fun SignInTab(
         Icon(
             imageVector = logoIcon(size = 96f),
             contentDescription = "Check In",
-            tint = if (checkedInToday) MutedWhite else LifeRed,
+            tint = iconColor,
             modifier = Modifier.size(96.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = if (checkedInToday) "今日已签到" else "点击签到",
+            text = if (checkedInToday) "今日已签到" else "长按签到",
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = if (checkedInToday) DimWhite else LifeRed,
                 fontSize = 14.sp
