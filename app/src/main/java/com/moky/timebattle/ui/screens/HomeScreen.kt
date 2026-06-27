@@ -209,6 +209,7 @@ private fun HomeContent(
                 .fillMaxWidth()
                 .padding(top = 18.dp)
                 .background(DeepGrey, RoundedCornerShape(14.dp))
+                .border(1.dp, StrokeLight, RoundedCornerShape(14.dp))
                 .clip(RoundedCornerShape(14.dp)),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
