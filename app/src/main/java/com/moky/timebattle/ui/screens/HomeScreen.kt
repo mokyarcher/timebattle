@@ -228,6 +228,10 @@ private fun HomeContent(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "labelHeight"
         ) { if (it) 0.dp else 24.dp }
+        val cardTopPadding by timerTransition.animateDp(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "cardTopPadding"
+        ) { if (it) 12.dp else 26.dp }
         val subtitleOffsetY by timerTransition.animateDp(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "subtitleOffsetY"
@@ -255,7 +259,8 @@ private fun HomeContent(
                     }
                 )
                 .animateContentSize()
-                .padding(vertical = 26.dp, horizontal = 20.dp),
+                .padding(horizontal = 20.dp)
+                .padding(top = cardTopPadding, bottom = 26.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
