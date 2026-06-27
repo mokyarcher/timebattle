@@ -199,7 +199,7 @@ private fun HomeContent(
         val timeFontSize by timerTransition.animateInt(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "timeFontSize"
-        ) { if (it) 20 else 48 }
+        ) { if (it) 24 else 48 }
         val timeScale by timerTransition.animateFloat(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "timeScale"
@@ -220,6 +220,10 @@ private fun HomeContent(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "clockHeight"
         ) { if (it) 180.dp else 0.dp }
+        val topSpacerHeight by timerTransition.animateDp(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "topSpacerHeight"
+        ) { if (it) 0.dp else 6.dp }
         val subtitleOffsetY by timerTransition.animateDp(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "subtitleOffsetY"
@@ -258,7 +262,7 @@ private fun HomeContent(
             ) {
                 SectionLabel(text = "remaining life")
             }
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(topSpacerHeight))
 
             Box(
                 modifier = Modifier
@@ -299,8 +303,6 @@ private fun HomeContent(
                 style = MaterialTheme.typography.labelSmall.copy(color = DimWhite, fontSize = 8.sp),
                 modifier = Modifier.offset { IntOffset(0, subtitleOffsetY.roundToPx()) }
             )
-            Spacer(modifier = Modifier.height(14.dp))
-            TimerBar(progress = progress)
         }
 
         // Tab bar
