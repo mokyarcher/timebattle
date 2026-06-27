@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logo Line Collection — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080809;
+    --surface: #0e0e10;
+    --surface-2: #141416;
+    --border: #1c1c20;
+    --border-light: #252528;
+    --accent: #c8a96e;
+    --accent-dim: #8a7648;
+    --accent-glow: rgba(200,169,110,0.08);
+    --accent-bright: #e2c88a;
+    --text: #e8e4de;
+    --text-secondary: #9a958e;
+    --text-muted: #5a5650;
+    --text-dim: #35332f;
+    --line-default: #6b6560;
+    --line-hover: #c8a96e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+    line-height: 1.7;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  /* ========== COVER ========== */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 80px 80px 100px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 50%;
+    height: 100%;
+    background: radial-gradient(ellipse at 80% 30%, rgba(200,169,110,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .cover-tag {
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 60px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.3s forwards;
+  }
+
+  .cover h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(42px, 6vw, 80px);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--text);
+    max-width: 700px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+  }
+
+  .cover h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .cover-sub {
+    margin-top: 30px;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    max-width: 500px;
+    line-height: 2;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 60px;
+    margin-top: 80px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1s forwards;
+  }
+
+  .cover-meta-item span {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .cover-meta-item p {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 300;
+    font-size: 13px;
+    color: var(--text-secondary);
+    letter-spacing: 0.08em;
+  }
+
+  /* ========== SECTION HEADER ========== */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 60px 80px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label .num {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--accent-dim);
+  }
+
+  .section-label .line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-label .title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ========== DESIGN LANGUAGE ========== */
+  .design-lang {
+    padding: 80px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 60px;
+  }
+
+  .dl-block h3 {
+    font-family: 'DM Mono', monospace;
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dl-block p {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 300;
+    font-size: 13px;
+    line-height: 2.2;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+  }
+
+  .dl-block p strong {
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* Color strip */
+  .color-strip {
+    display: flex;
+    gap: 1px;
+    margin-top: 16px;
+    height: 32px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .color-strip div {
+    flex: 1;
+    position: relative;
+  }
+
+  .color-strip div::after {
+    content: attr(data-name);
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    white-space: nowrap;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ========== LOGO CARD SECTION ========== */
+  .logo-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+
+  .logo-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 60px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: background 0.6s ease;
+  }
+
+  .logo-panel::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    pointer-events: none;
+  }
+
+  .logo-panel:hover::before {
+    transform: translate(-50%, -50%) scale(1.3);
+  }
+
+  .logo-panel:hover {
+    background: var(--surface);
+  }
+
+  .panel-num {
+    position: absolute;
+    top: 28px;
+    left: 32px;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--text-dim);
+  }
+
+  .corner { position: absolute; width: 18px; height: 18px; opacity: 0; transition: opacity 0.5s; }
+  .corner.tl { top: 22px; left: 22px; border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); }
+  .corner.br { bottom: 22px; right: 22px; border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); }
+  .logo-panel:hover .corner { opacity: 0.35; }
+
+  /* SVG */
+  .logo-wrap {
+    width: 200px;
+    height: 200px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo-wrap svg { width: 100%; height: 100%; }
+
+  .ln  { fill:none; stroke:var(--line-default); stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round; transition: stroke .5s, filter .5s; }
+  .lna { fill:none; stroke:var(--line-default); stroke-width:.8; stroke-linecap:round; opacity:.45; transition: stroke .5s, opacity .5s; }
+  .dt  { fill:var(--line-default); transition: fill .5s; }
+  .lf  { fill:none; stroke:var(--line-default); stroke-width:1; transition: stroke .5s; }
+
+  .logo-panel:hover .ln  { stroke:var(--line-hover); filter:drop-shadow(0 0 8px rgba(200,169,110,.25)); }
+  .logo-panel:hover .lna { stroke:var(--line-hover); opacity:.7; }
+  .logo-panel:hover .dt  { fill:var(--line-hover); }
+  .logo-panel:hover .lf  { stroke:var(--line-hover); }
+
+  /* Labels */
+  .panel-label {
+    margin-top: 48px;
+    text-align: center;
+    z-index: 1;
+  }
+
+  .panel-label .cn {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 300;
+    font-size: 16px;
+    letter-spacing: 0.5em;
+    color: var(--text-muted);
+    transition: color .5s;
+  }
+
+  .panel-label .en {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 6px;
+    transition: color .5s;
+  }
+
+  .logo-panel:hover .panel-label .cn { color: var(--accent); }
+  .logo-panel:hover .panel-label .en { color: var(--text-muted); }
+
+  /* ========== LOGO DESCRIPTION ========== */
+  .logo-desc-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-desc {
+    padding: 60px 70px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .logo-desc .tag {
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-desc .tag::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--accent-dim);
+  }
+
+  .logo-desc .concept-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .logo-desc .concept-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .logo-desc .body {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 300;
+    font-size: 12.5px;
+    line-height: 2.3;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
+  }
+
+  .logo-desc .keywords {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .logo-desc .keywords span {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    transition: border-color .3s, color .3s;
+  }
+
+  .logo-desc .keywords span:hover {
+    border-color: var(--accent-dim);
+    color: var(--text-muted);
+  }
+
+  /* Specs */
+  .spec-row {
+    display: flex;
+    gap: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+
+  .spec-item {
+    flex: 1;
+  }
+
+  .spec-item .spec-key {
+    font-size: 8px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .spec-item .spec-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ========== PRINCIPLES ========== */
+  .principles {
+    padding: 80px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 50px;
+  }
+
+  .principle {
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+    transition: border-color .4s;
+  }
+
+  .principle:hover {
+    border-top-color: var(--accent-dim);
+  }
+
+  .principle .p-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    transition: color .4s;
+  }
+
+  .principle:hover .p-num { color: var(--accent-dim); }
+
+  .principle .p-title {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+  }
+
+  .principle .p-body {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 300;
+    font-size: 11.5px;
+    line-height: 2.2;
+    color: var(--text-muted);
+  }
+
+  /* ========== PALETTE ========== */
+  .palette-section {
+    padding: 70px 80px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    margin-top: 30px;
+  }
+
+  .swatch {
+    aspect-ratio: 1 / 0.7;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .3s;
+  }
+
+  .swatch:hover { transform: scale(1.05); }
+
+  .swatch::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .swatch.light::after { color: rgba(0,0,0,.4); }
+  .swatch.dark::after { color: rgba(255,255,255,.4); }
+
+  /* ========== FOOTER ========== */
+  .footer {
+    padding: 60px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer span {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--text-dim);
+  }
+
+  /* ========== ANIMATIONS ========== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Clock */
+  .logo-panel:hover .ck-s { animation: crot 4s linear infinite; transform-origin: 100px 100px; }
+  .logo-panel:hover .ck-m { animation: crot 28s linear infinite; transform-origin: 100px 100px; }
+  @keyframes crot { to { transform: rotate(360deg); } }
+
+  /* Sync */
+  .logo-panel:hover .sy-cw  { animation: scw 2.2s ease-in-out infinite;  transform-origin: 100px 100px; }
+  .logo-panel:hover .sy-ccw { animation: sccw 2.2s ease-in-out infinite; transform-origin: 100px 100px; }
+  @keyframes scw  { 0%,100%{transform:rotate(0)} 50%{transform:rotate(180deg)} }
+  @keyframes sccw { 0%,100%{transform:rotate(0)} 50%{transform:rotate(-180deg)} }
+
+  /* Upload */
+  .logo-panel:hover .up-arr { animation: uflt 1.6s ease-in-out infinite; }
+  .logo-panel:hover .up-p1  { animation: upart 1.6s ease-in-out 0s infinite; }
+  .logo-panel:hover .up-p2  { animation: upart 1.6s ease-in-out .3s infinite; }
+  .logo-panel:hover .up-p3  { animation: upart 1.6s ease-in-out .6s infinite; }
+  @keyframes uflt { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+  @keyframes upart { 0%{opacity:0;transform:translateY(0)} 25%{opacity:1} 100%{opacity:0;transform:translateY(-20px)} }
+
+  /* Transfer */
+  .logo-panel:hover .td1 { animation: tf1 2s ease-in-out infinite; }
+  .logo-panel:hover .td2 { animation: tf1 2s ease-in-out 1s; }
+  .logo-panel:hover .td3 { animation: tf2 2s ease-in-out infinite; }
+  .logo-panel:hover .td4 { animation: tf2 2s ease-in-out 1s; }
+  @keyframes tf1 { 0%{opacity:0;transform:translateX(0)} 15%{opacity:1} 85%{opacity:1} 100%{opacity:0;transform:translateX(40px)} }
+  @keyframes tf2 { 0%{opacity:0;transform:translateX(0)} 15%{opacity:1} 85%{opacity:1} 100%{opacity:0;transform:translateX(-40px)} }
+
+  @media (max-width:1000px) {
+    .cover { padding: 50px 30px 70px; }
+    .design-lang { grid-template-columns:1fr; padding:50px 30px; gap:40px; }
+    .logo-section, .logo-desc-section { grid-template-columns:1fr; }
+    .principles { grid-template-columns:1fr 1fr; padding:50px 30px; gap:30px; }
+    .palette-grid { grid-template-columns:repeat(3,1fr); }
+    .section-label, .palette-section, .footer { padding-left:30px; padding-right:30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER ==================== -->
+<section class="cover">
+  <div class="cover-tag">Logo Line Collection / Design System</div>
+  <h1>The Art of<br><em>Fine Lines</em></h1>
+  <p class="cover-sub">以纯粹线条探索「时钟」「同步」「上传」「传输」四个数字概念的视觉本质——<br>追求精密、克制、呼吸感之间的优雅平衡。</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><span>Project</span><p>图标系统设计</p></div>
+    <div class="cover-meta-item"><span>Style</span><p>线性 · 极简 · 精密</p></div>
+    <div class="cover-meta-item"><span>Count</span><p>004 枚标识</p></div>
+    <div class="cover-meta-item"><span>Year</span><p>2026</p></div>
+  </div>
+</section>
+
+<!-- ==================== DESIGN LANGUAGE ==================== -->
+<div class="section-label">
+  <span class="num">01</span>
+  <span class="line"></span>
+  <span class="title">Design Language</span>
+</div>
+
+<section class="design-lang">
+  <div class="dl-block">
+    <h3>线条哲学</h3>
+    <p>线条是视觉世界中最纯粹的表达。我们摒弃一切填充与阴影，仅以 <strong>1.0—1.4px 的精密描边</strong>构建图形。<br><br>每一条线都经过反复推敲：粗细的微妙差异创造层次，虚实的交替使用赋予节奏。<strong>线条不仅是轮廓，更是表达。</strong></p>
+  </div>
+  <div class="dl-block">
+    <h3>色彩体系</h3>
+    <p>系统建立在 <strong>深邃的暗色基底</strong>之上，以近乎纯黑的背景衬托精密的金属色线条。<br><br>静止状态下，线条呈温暖的铜褐色调，沉稳而不张扬；交互瞬间，<strong>金色高光</strong>沿着线条流转，如同精密仪器被唤醒。<br></p>
+    <div class="color-strip">
+      <div style="background:#080809" data-name="#080809"></div>
+      <div style="background:#141416" data-name="#141416"></div>
+      <div style="background:#35332f" data-name="#35332f"></div>
+      <div style="background:#6b6560" data-name="#6b6560"></div>
+      <div style="background:#c8a96e" data-name="#c8a96e"></div>
+      <div style="background:#e2c88a" data-name="#e2c88a"></div>
+    </div>
+  </div>
+  <div class="dl-block">
+    <h3>动态语言</h3>
+    <p>运动不是装饰，是语义的延伸。<br><br>时钟的指针本应旋转，同步的弧线理应循环，上传的箭头天然上升——<strong>每个动效都从图标自身的语义中自然生长</strong>。<br><br>缓动曲线经过精心调校，既不过于机械也不过于飘逸，追求<strong>高级而克制的呼吸感</strong>。</p>
+  </div>
+</section>
+
+<!-- ==================== LOGOS DISPLAY ==================== -->
+<div class="section-label">
+  <span class="num">02</span>
+  <span class="line"></span>
+  <span class="title">Logo Showcase</span>
+</div>
+
+<section class="logo-section">
+
+  <!-- 1. CLOCK -->
+  <div class="logo-panel">
+    <span class="panel-num">001</span>
+    <div class="corner tl"></div><div class="corner br"></div>
+    <div class="logo-wrap">
+      <svg viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="76" class="ln"/>
+        <circle cx="100" cy="100" r="71" class="lna" stroke-dasharray="2 9"/>
+        <line x1="100" y1="28" x2="100" y2="38" class="ln"/>
+        <line x1="100" y1="162" x2="100" y2="172" class="ln"/>
+        <line x1="28" y1="100" x2="38" y2="100" class="ln"/>
+        <line x1="162" y1="100" x2="172" y2="100" class="ln"/>
+        <line x1="148" y1="44" x2="142" y2="50" class="lna"/>
+        <line x1="156" y1="82" x2="148" y2="84" class="lna"/>
+        <line x1="52" y1="44" x2="58" y2="50" class="lna"/>
+        <line x1="44" y1="82" x2="52" y2="84" class="lna"/>
+        <line x1="148" y1="156" x2="142" y2="150" class="lna"/>
+        <line x1="156" y1="118" x2="148" y2="116" class="lna"/>
+        <line x1="52" y1="156" x2="58" y2="150" class="lna"/>
+        <line x1="44" y1="118" x2="52" y2="116" class="lna"/>
+        <g class="ck-m">
+          <line x1="100" y1="100" x2="100" y2="46" class="ln" stroke-width="1.6"/>
+          <line x1="100" y1="100" x2="100" y2="108" class="ln" stroke-width="1.6"/>
+        </g>
+        <g class="ck-s">
+          <line x1="100" y1="100" x2="100" y2="38" class="ln" stroke-width=".5" stroke-dasharray="0.5 3.5"/>
+          <line x1="100" y1="112" x2="100" y2="100" class="ln" stroke-width=".5"/>
+        </g>
+        <circle cx="100" cy="100" r="3" class="dt"/>
+        <circle cx="100" cy="100" r="6" class="lf" stroke-dasharray="1.5 3"/>
+      </svg>
+    </div>
+    <div class="panel-label">
+      <div class="cn">时 钟</div>
+      <div class="en">Clock</div>
+    </div>
+  </div>
+
+  <!-- 2. SYNC -->
+  <div class="logo-panel">
+    <span class="panel-num">002</span>
+    <div class="corner tl"></div><div class="corner br"></div>
+    <div class="logo-wrap">
+      <svg viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="78" class="lna" stroke-dasharray="1 7"/>
+        <g class="sy-cw">
+          <path d="M 72 64 A 38 38 0 0 1 128 64" class="ln" fill="none"/>
+          <polyline points="122,50 128,64 115,58" class="ln" fill="none"/>
+          <circle cx="100" cy="55" r="2.5" class="dt"/>
+        </g>
+        <g class="sy-ccw">
+          <path d="M 128 136 A 38 38 0 0 1 72 136" class="ln" fill="none"/>
+          <polyline points="78,150 72,136 85,142" class="ln" fill="none"/>
+          <circle cx="100" cy="145" r="2.5" class="dt"/>
+        </g>
+        <line x1="72" y1="70" x2="72" y2="130" class="lna"/>
+        <line x1="128" y1="70" x2="128" y2="130" class="lna"/>
+        <path d="M 100 88 L 112 100 L 100 112 L 88 100 Z" class="ln" fill="none"/>
+        <circle cx="100" cy="100" r="2.5" class="dt"/>
+        <circle cx="100" cy="18" r="1.5" class="dt" opacity=".35"/>
+        <circle cx="100" cy="182" r="1.5" class="dt" opacity=".35"/>
+        <circle cx="18" cy="100" r="1.5" class="dt" opacity=".35"/>
+        <circle cx="182" cy="100" r="1.5" class="dt" opacity=".35"/>
+        <circle cx="42" cy="42" r="1" class="dt" opacity=".2"/>
+        <circle cx="158" cy="42" r="1" class="dt" opacity=".2"/>
+        <circle cx="42" cy="158" r="1" class="dt" opacity=".2"/>
+        <circle cx="158" cy="158" r="1" class="dt" opacity=".2"/>
+      </svg>
+    </div>
+    <div class="panel-label">
+      <div class="cn">同 步</div>
+      <div class="en">Sync</div>
+    </div>
+  </div>
+
+  <!-- 3. UPLOAD -->
+  <div class="logo-panel">
+    <span class="panel-num">003</span>
+    <div class="corner tl"></div><div class="corner br"></div>
+    <div class="logo-wrap">
+      <svg viewBox="0 0 200 200">
+        <path d="M 56 118 A 24 24 0 0 1 60 80 A 30 30 0 0 1 118 72 A 26 26 0 0 1 146 98 A 20 20 0 0 1 140 118 Z" class="ln" fill="none"/>
+        <path d="M 64 114 A 18 18 0 0 1 68 86 A 22 22 0 0 1 114 79 A 20 20 0 0 1 136 100 A 14 14 0 0 1 132 114 Z" class="lna" fill="none" stroke-dasharray="2 5"/>
+        <g class="up-arr">
+          <line x1="100" y1="114" x2="100" y2="54" class="ln" stroke-width="1.6"/>
+          <polyline points="84,70 100,54 116,70" class="ln" fill="none" stroke-width="1.6"/>
+          <circle cx="100" cy="54" r="2.5" class="dt"/>
+        </g>
+        <circle cx="80" cy="64" r="1.8" class="dt up-p1" opacity=".5"/>
+        <circle cx="120" cy="60" r="1.4" class="dt up-p2" opacity=".4"/>
+        <circle cx="100" cy="44" r="1.2" class="dt up-p3" opacity=".3"/>
+        <line x1="72" y1="128" x2="128" y2="128" class="lna"/>
+        <line x1="84" y1="133" x2="116" y2="133" class="lna" stroke-width=".5"/>
+        <path d="M 86 44 A 18 18 0 0 1 114 44" class="lna" fill="none" stroke-width=".5"/>
+        <path d="M 90 38 A 14 14 0 0 1 110 38" class="lna" fill="none" stroke-width=".4"/>
+      </svg>
+    </div>
+    <div class="panel-label">
+      <div class="cn">上 传</div>
+      <div class="en">Upload</div>
+    </div>
+  </div>
+
+  <!-- 4. TRANSFER -->
+  <div class="logo-panel">
+    <span class="panel-num">004</span>
+    <div class="corner tl"></div><div class="corner br"></div>
+    <div class="logo-wrap">
+      <svg viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="80" class="lna" stroke-dasharray="1 9" opacity=".25"/>
+        <circle cx="44" cy="100" r="16" class="ln"/>
+        <circle cx="44" cy="100" r="11" class="lna" stroke-dasharray="1.5 3.5"/>
+        <circle cx="44" cy="100" r="3.5" class="dt"/>
+        <circle cx="156" cy="100" r="16" class="ln"/>
+        <circle cx="156" cy="100" r="11" class="lna" stroke-dasharray="1.5 3.5"/>
+        <circle cx="156" cy="100" r="3.5" class="dt"/>
+        <path d="M 60 90 Q 100 72 140 90" class="ln" fill="none"/>
+        <path d="M 60 110 Q 100 128 140 110" class="ln" fill="none"/>
+        <line x1="60" y1="100" x2="140" y2="100" class="lna" stroke-dasharray="2 5"/>
+        <circle cx="72" cy="86" r="2.2" class="dt td1"/>
+        <circle cx="86" cy="80" r="1.6" class="dt td2" opacity=".6"/>
+        <circle cx="128" cy="86" r="2.2" class="dt td3"/>
+        <circle cx="114" cy="80" r="1.6" class="dt td4" opacity=".6"/>
+        <line x1="44" y1="80" x2="44" y2="74" class="lna" stroke-width=".5"/>
+        <line x1="44" y1="120" x2="44" y2="126" class="lna" stroke-width=".5"/>
+        <line x1="156" y1="80" x2="156" y2="74" class="lna" stroke-width=".5"/>
+        <line x1="156" y1="120" x2="156" y2="126" class="lna" stroke-width=".5"/>
+        <line x1="88" y1="32" x2="112" y2="32" class="lna" stroke-width=".5"/>
+        <circle cx="100" cy="32" r="1.5" class="dt" opacity=".3"/>
+        <line x1="88" y1="168" x2="112" y2="168" class="lna" stroke-width=".5"/>
+        <circle cx="100" cy="168" r="1.5" class="dt" opacity=".3"/>
+      </svg>
+    </div>
+    <div class="panel-label">
+      <div class="cn">传 输</div>
+      <div class="en">Transfer</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ==================== DESCRIPTIONS ==================== -->
+<div class="section-label">
+  <span class="num">03</span>
+  <span class="line"></span>
+  <span class="title">Design Rationale</span>
+</div>
+
+<section class="logo-desc-section">
+
+  <!-- Clock Desc -->
+  <div class="logo-desc">
+    <div class="tag">001 / 时钟 / Clock</div>
+    <div class="concept-title">精密之上的<br><em>呼吸韵律</em></div>
+    <div class="body">
+      时钟图标的灵感源自传统钟表的精密机械结构。双层圆环构成视觉基座，外圈为主刻度环，内圈以不等距的虚线段暗示时间的流动。<br><br>
+      四组主刻度与八组副刻度构成完整的方位系统，分针与秒针采用不同粗细与虚实处理——<strong>实线表达确定，虚线表达可能</strong>。中心的复合节点由实心点与虚线环组成，象征时间的核心与涟漪。
+    </div>
+    <div class="keywords">
+      <span>Precision</span>
+      <span>Chromatic</span>
+      <span>Layered</span>
+      <span>Circular</span>
+    </div>
+    <div class="spec-row">
+      <div class="spec-item"><div class="spec-key">结构</div><div class="spec-val">双环 + 十二刻度 + 双针</div></div>
+      <div class="spec-item"><div class="spec-key">动效</div><div class="spec-val">指针均速旋转</div></div>
+      <div class="spec-item"><div class="spec-key">笔画</div><div class="spec-val">1.0 — 1.6px</div></div>
+    </div>
+  </div>
+
+  <!-- Sync Desc -->
+  <div class="logo-desc">
+    <div class="tag">002 / 同步 / Sync</div>
+    <div class="concept-title">对立之中<br><em>达成统一</em></div>
+    <div class="body">
+      同步是两个独立系统之间的状态趋同。图标以一对对称的弧线箭头构成核心——上弧顺时针、下弧逆时针，形成视觉上的力场张力。<br><br>
+      中心的菱形节点是两股力量的交汇点，同时也是信息的中继站。两侧的垂直连线暗示通道的存在，外围以稀疏的点阵构建出精密的坐标系统。<strong>一切有序，一切同步。</strong>
+    </div>
+    <div class="keywords">
+      <span>Symmetry</span>
+      <span>Tension</span>
+      <span>Equilibrium</span>
+      <span>Resonance</span>
+    </div>
+    <div class="spec-row">
+      <div class="spec-item"><div class="spec-key">结构</div><div class="spec-val">对向弧线 + 菱形节点</div></div>
+      <div class="spec-item"><div class="spec-key">动效</div><div class="spec-val">双向交替旋转</div></div>
+      <div class="spec-item"><div class="spec-key">笔画</div><div class="spec-val">0.8 — 1.2px</div></div>
+    </div>
+  </div>
+
+  <!-- Upload Desc -->
+  <div class="logo-desc">
+    <div class="tag">003 / 上传 / Upload</div>
+    <div class="concept-title">突破重力的<br><em>向上意志</em></div>
+    <div class="body">
+      上传的本质是克服引力、将信息送达云端。云的轮廓采用连续曲线构成，线条舒展而不失结构感，内部以更细的虚线描出内轮廓，营造空间的前后层次。<br><br>
+      中心箭头贯穿云体底部，直指天际。箭头两侧的弧形信号线暗示无线传输的无形通道。<strong>最精妙的细节在于上浮粒子</strong>——三个大小递减的点沿箭头轴线上升，让静态的图标也充满向上的动能。
+    </div>
+    <div class="keywords">
+      <span>Ascension</span>
+      <span>Cloud</span>
+      <span>Aspiration</span>
+      <span>Lightness</span>
+    </div>
+    <div class="spec-row">
+      <div class="spec-item"><div class="spec-key">结构</div><div class="spec-val">云体 + 箭头 + 信号弧</div></div>
+      <div class="spec-item"><div class="spec-key">动效</div><div class="spec-val">箭头上浮 + 粒子升腾</div></div>
+      <div class="spec-item"><div class="spec-key">笔画</div><div class="spec-val">0.4 — 1.6px</div></div>
+    </div>
+  </div>
+
+  <!-- Transfer Desc -->
+  <div class="logo-desc">
+    <div class="tag">004 / 传输 / Transfer</div>
+    <div class="concept-title">两端之间<br><em>流动不息</em></div>
+    <div class="body">
+      传输发生在两个节点之间。图标以双节点为核心骨架——每个节点由三层同心结构（外环、虚线环、实心核）组成，暗示数据的封装与解封过程。<br><br>
+      上下两条弧线通道连接两端，构成数据流动的双向管道。中间的虚线是中轴线，也是同步信号的时钟基准。<strong>沿通道运动的光点</strong>是整个系统的心跳，它们从一端出发、抵达另一端，永不停歇。
+    </div>
+    <div class="keywords">
+      <span>Flow</span>
+      <span>Nodes</span>
+      <span>Bi-directional</span>
+      <span>Pulse</span>
+    </div>
+    <div class="spec-row">
+      <div class="spec-item"><div class="spec-key">结构</div><div class="spec-val">双节点 + 双向弧线</div></div>
+      <div class="spec-item"><div class="spec-key">动效</div><div class="spec-val">光点沿路径往返</div></div>
+      <div class="spec-item"><div class="spec-key">笔画</div><div class="spec-val">0.5 — 1.2px</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ==================== PRINCIPLES ==================== -->
+<div class="section-label">
+  <span class="num">04</span>
+  <span class="line"></span>
+  <span class="title">Design Principles</span>
+</div>
+
+<section class="principles">
+  <div class="principle">
+    <div class="p-num">01</div>
+    <div class="p-title">精密即美</div>
+    <div class="p-body">线条的精确度直接决定品质感知。1px 的偏差可以成就也可以摧毁整个构图。我们追求工程级的精确，让每一笔都有存在的理由。</div>
+  </div>
+  <div class="principle">
+    <div class="p-num">02</div>
+    <div class="p-title">虚实相生</div>
+    <div class="p-body">实线勾勒确定，虚线暗示可能。虚实交替创造出视觉节奏，让静态图形具有呼吸感和时间性，避免线条的沉闷与单调。</div>
+  </div>
+  <div class="principle">
+    <div class="p-num">03</div>
+    <div class="p-title">语义驱动</div>
+    <div class="p-body">每个图形元素都承载语义。动效不是后期添加的装饰，而是从图标内涵中自然生长出来的必然表达——时钟转、数据流、箭头上行。</div>
+  </div>
+  <div class="principle">
+    <div class="p-num">04</div>
+    <div class="p-title">克制交互</div>
+    <div class="p-body">hover 不是爆炸，而是唤醒。色彩从沉稳到明亮的过渡时间、光晕的扩散范围、动画的缓动曲线——所有参数都以「高级感」为唯一标尺。</div>
+  </div>
+</section>
+
+<!-- ==================== PALETTE ==================== -->
+<div class="section-label">
+  <span class="num">05</span>
+  <span class="line"></span>
+  <span class="title">Color Specification</span>
+</div>
+
+<section class="palette-section">
+  <div class="palette-grid">
+    <div class="swatch dark" style="background:#080809" data-label="#080809 Background"></div>
+    <div class="swatch dark" style="background:#0e0e10" data-label="#0e0e10 Surface"></div>
+    <div class="swatch dark" style="background:#35332f" data-label="#35332f Muted"></div>
+    <div class="swatch dark" style="background:#6b6560" data-label="#6b6560 Default"></div>
+    <div class="swatch light" style="background:#c8a96e" data-label="#c8a96e Accent"></div>
+    <div class="swatch light" style="background:#e2c88a" data-label="#e2c88a Bright"></div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer">
+  <span>Logo Line Collection / 2026</span>
+  <span>Design System Document / 001 — 004</span>
+</footer>
+
+</body>
+</html>

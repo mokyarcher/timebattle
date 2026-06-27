@@ -1,10 +1,16 @@
 package com.moky.timebattle.ui.screens
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +24,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.basicMarquee
@@ -37,7 +44,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -45,6 +54,7 @@ import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,6 +68,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.moky.timebattle.data.model.formatAsLifeTime
 import com.moky.timebattle.data.model.formatCompact
+import com.moky.timebattle.ui.components.DynamicClock
 import com.moky.timebattle.ui.components.SectionLabel
 import com.moky.timebattle.ui.components.TimerBar
 import com.moky.timebattle.ui.components.icons.bellIcon
@@ -174,6 +185,46 @@ private fun HomeContent(
         }
 
         // Timer card
+        var showClockMode by remember { mutableStateOf(false) }
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val timerTransition = updateTransition(targetState = showClockMode, label = "timerMode")
+        val titleAlpha by timerTransition.animateFloat(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "titleAlpha"
+        ) { if (it) 0f else 1f }
+        val titleOffsetY by timerTransition.animateDp(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "titleOffsetY"
+        ) { if (it) (-12).dp else 0.dp }
+        val timeFontSize by timerTransition.animateInt(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "timeFontSize"
+        ) { if (it) 20 else 48 }
+        val timeScale by timerTransition.animateFloat(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "timeScale"
+        ) { if (it) 1f else 1f }
+        val timeOffsetY by timerTransition.animateDp(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "timeOffsetY"
+        ) { if (it) 190.dp else 0.dp }
+        val clockAlpha by timerTransition.animateFloat(
+            transitionSpec = { tween(600, easing = FastOutSlowInEasing) },
+            label = "clockAlpha"
+        ) { if (it) 1f else 0f }
+        val clockScale by timerTransition.animateFloat(
+            transitionSpec = { tween(600, easing = FastOutSlowInEasing) },
+            label = "clockScale"
+        ) { if (it) 1f else 0.75f }
+        val clockHeight by timerTransition.animateDp(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "clockHeight"
+        ) { if (it) 180.dp else 0.dp }
+        val subtitleOffsetY by timerTransition.animateDp(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "subtitleOffsetY"
+        ) { if (it) 200.dp else 0.dp }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -187,19 +238,54 @@ private fun HomeContent(
                     ),
                     RoundedCornerShape(18.dp)
                 )
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = ripple(),
+                    onClick = {
+                        VibrationHelper.vibrate(context, 30)
+                        showClockMode = !showClockMode
+                    }
+                )
+                .animateContentSize()
                 .padding(vertical = 26.dp, horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            SectionLabel(text = "remaining life")
+            Box(
+                modifier = Modifier
+                    .alpha(titleAlpha)
+                    .offset { IntOffset(0, titleOffsetY.roundToPx()) },
+                contentAlignment = Alignment.Center
+            ) {
+                SectionLabel(text = "remaining life")
+            }
             Spacer(modifier = Modifier.height(6.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(clockHeight)
+                    .alpha(clockAlpha)
+                    .scale(clockScale),
+                contentAlignment = Alignment.Center
+            ) {
+                if (clockAlpha > 0f) {
+                    DynamicClock(modifier = Modifier.size(180.dp))
+                }
+            }
+
             Text(
                 text = user.remainingSeconds.formatAsLifeTime(),
-                style = TimerDigitsStyle,
+                style = TimerDigitsStyle.copy(
+                    fontSize = timeFontSize.sp,
+                    color = LifeRed
+                ),
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 softWrap = false,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .offset { IntOffset(0, timeOffsetY.roundToPx()) }
+                    .scale(timeScale)
                     .basicMarquee(
                         iterations = Int.MAX_VALUE,
                         animationMode = androidx.compose.foundation.MarqueeAnimationMode.Immediately,
@@ -210,7 +296,8 @@ private fun HomeContent(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "−1/min · today consumed ${(24 * 3600 - user.remainingSeconds.coerceAtMost(24 * 3600)).formatCompact()}",
-                style = MaterialTheme.typography.labelSmall.copy(color = DimWhite, fontSize = 8.sp)
+                style = MaterialTheme.typography.labelSmall.copy(color = DimWhite, fontSize = 8.sp),
+                modifier = Modifier.offset { IntOffset(0, subtitleOffsetY.roundToPx()) }
             )
             Spacer(modifier = Modifier.height(14.dp))
             TimerBar(progress = progress)
