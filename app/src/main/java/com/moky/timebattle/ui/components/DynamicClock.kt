@@ -34,7 +34,7 @@ fun DynamicClock(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(4000, easing = LinearEasing)
+            animation = tween(60000, easing = LinearEasing)
         ),
         label = "secondHand"
     )
@@ -42,7 +42,7 @@ fun DynamicClock(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(28000, easing = LinearEasing)
+            animation = tween(3600000, easing = LinearEasing)
         ),
         label = "minuteHand"
     )
