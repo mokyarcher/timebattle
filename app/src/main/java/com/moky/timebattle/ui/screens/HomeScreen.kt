@@ -430,14 +430,6 @@ private fun SignInTab(
                     onPress = {
                         if (checkedInToday || isCompleted) return@detectTapGestures
 
-                        // Start progress animation
-                        val progressJob = scope.launch {
-                            pressProgress.animateTo(
-                                targetValue = 1f,
-                                animationSpec = tween(durationMillis = 1200)
-                            )
-                        }
-
                         // Continuous vibration while pressed
                         val vibrationJob = scope.launch {
                             while (isActive) {
@@ -446,15 +438,25 @@ private fun SignInTab(
                             }
                         }
 
+                        // Start progress animation; auto-complete when filled
+                        val progressJob = scope.launch {
+                            pressProgress.animateTo(
+                                targetValue = 1f,
+                                animationSpec = tween(durationMillis = 1200)
+                            )
+                            vibrationJob.cancel()
+                            if (!isCompleted) {
+                                isCompleted = true
+                                onCheckIn()
+                            }
+                        }
+
                         tryAwaitRelease()
 
                         vibrationJob.cancel()
+                        progressJob.cancel()
 
-                        if (pressProgress.value >= 0.98f) {
-                            isCompleted = true
-                            onCheckIn()
-                        } else {
-                            progressJob.cancel()
+                        if (!isCompleted) {
                             scope.launch {
                                 pressProgress.animateTo(
                                     targetValue = 0f,
