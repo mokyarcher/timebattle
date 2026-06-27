@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,12 +38,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import com.moky.timebattle.data.AppViewModel
 import com.moky.timebattle.data.model.AppState
@@ -265,20 +272,153 @@ private fun HomeContent(
 }
 
 @Composable
+private fun CheckInLogo(
+    progress: Float,
+    modifier: Modifier = Modifier,
+    baseColor: Color = MutedWhite,
+    activeColor: Color = LifeRed
+) {
+    Canvas(modifier = modifier.size(96.dp)) {
+        val sizePx = size.width
+        val cx = sizePx / 2f
+        val cy = sizePx / 2f
+        val r1 = sizePx * 0.4375f
+        val r2 = sizePx * 0.3125f
+        val strokeMain = sizePx * 0.0156f
+        val strokeThin = sizePx * 0.0078f
+        val dotR = sizePx * 0.026f
+
+        // Tick mark at top of outer circle
+        val tickStart = Offset(cx, cy - r1 + strokeMain)
+        val tickEnd = Offset(cx, cy - r1 + strokeMain + sizePx * 0.125f)
+        val currentTickEnd = Offset(
+            tickStart.x + (tickEnd.x - tickStart.x) * progress,
+            tickStart.y + (tickEnd.y - tickStart.y) * progress
+        )
+
+        // Minute hand (long, pointing up)
+        val minuteStart = Offset(cx, cy)
+        val minuteEnd = Offset(cx, cy - sizePx * 0.125f)
+        val currentMinuteEnd = Offset(
+            minuteStart.x + (minuteEnd.x - minuteStart.x) * progress,
+            minuteStart.y + (minuteEnd.y - minuteStart.y) * progress
+        )
+
+        // Hour hand (short, pointing down-right)
+        val hourStart = Offset(cx, cy)
+        val hourEnd = Offset(cx + sizePx * 0.125f, cy + sizePx * 0.0625f)
+        val currentHourEnd = Offset(
+            hourStart.x + (hourEnd.x - hourStart.x) * progress,
+            hourStart.y + (hourEnd.y - hourStart.y) * progress
+        )
+
+        // Draw base (white) full shapes
+        drawCircle(
+            color = baseColor,
+            radius = r1,
+            center = Offset(cx, cy),
+            style = Stroke(width = strokeMain)
+        )
+        drawCircle(
+            color = baseColor,
+            radius = r2,
+            center = Offset(cx, cy),
+            style = Stroke(width = strokeThin)
+        )
+        drawLine(
+            color = baseColor,
+            start = tickStart,
+            end = tickEnd,
+            strokeWidth = strokeMain * 0.8f,
+            cap = StrokeCap.Round
+        )
+        drawLine(
+            color = baseColor,
+            start = minuteStart,
+            end = minuteEnd,
+            strokeWidth = strokeMain * 0.8f,
+            cap = StrokeCap.Round
+        )
+        drawLine(
+            color = baseColor,
+            start = hourStart,
+            end = hourEnd,
+            strokeWidth = strokeMain * 0.8f,
+            cap = StrokeCap.Round
+        )
+        if (progress < 1f) {
+            drawCircle(
+                color = baseColor,
+                radius = dotR,
+                center = Offset(cx, cy)
+            )
+        }
+
+        // Draw active (red) progress shapes
+        val sweep = 360f * progress
+        drawArc(
+            color = activeColor,
+            startAngle = -90f,
+            sweepAngle = sweep,
+            useCenter = false,
+            topLeft = Offset(cx - r1, cy - r1),
+            size = androidx.compose.ui.geometry.Size(r1 * 2, r1 * 2),
+            style = Stroke(width = strokeMain)
+        )
+        drawArc(
+            color = activeColor,
+            startAngle = -90f,
+            sweepAngle = sweep,
+            useCenter = false,
+            topLeft = Offset(cx - r2, cy - r2),
+            size = androidx.compose.ui.geometry.Size(r2 * 2, r2 * 2),
+            style = Stroke(width = strokeThin)
+        )
+        if (progress > 0f) {
+            drawLine(
+                color = activeColor,
+                start = tickStart,
+                end = currentTickEnd,
+                strokeWidth = strokeMain * 0.8f,
+                cap = StrokeCap.Round
+            )
+            drawLine(
+                color = activeColor,
+                start = minuteStart,
+                end = currentMinuteEnd,
+                strokeWidth = strokeMain * 0.8f,
+                cap = StrokeCap.Round
+            )
+            drawLine(
+                color = activeColor,
+                start = hourStart,
+                end = currentHourEnd,
+                strokeWidth = strokeMain * 0.8f,
+                cap = StrokeCap.Round
+            )
+        }
+        if (progress >= 1f) {
+            drawCircle(
+                color = activeColor,
+                radius = dotR,
+                center = Offset(cx, cy)
+            )
+        }
+    }
+}
+
+@Composable
 private fun SignInTab(
     lastCheckInDate: String?,
     onCheckIn: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val today = remember { LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) }
     val checkedInToday = lastCheckInDate == today
     val pressProgress = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
-    val iconColor = if (checkedInToday) {
-        MutedWhite
-    } else {
-        lerp(MutedWhite, LifeRed, pressProgress.value)
-    }
+    var isCompleted by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -288,22 +428,39 @@ private fun SignInTab(
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {
-                        if (checkedInToday) return@detectTapGestures
-                        scope.launch {
+                        if (checkedInToday || isCompleted) return@detectTapGestures
+
+                        // Start progress animation
+                        val progressJob = scope.launch {
                             pressProgress.animateTo(
                                 targetValue = 1f,
                                 animationSpec = tween(durationMillis = 1200)
                             )
                         }
-                        val released = tryAwaitRelease()
-                        if (released && pressProgress.value >= 0.95f) {
-                            onCheckIn()
+
+                        // Continuous vibration while pressed
+                        val vibrationJob = scope.launch {
+                            while (isActive) {
+                                VibrationHelper.vibrate(context, 50)
+                                kotlinx.coroutines.delay(60)
+                            }
                         }
-                        scope.launch {
-                            pressProgress.animateTo(
-                                targetValue = 0f,
-                                animationSpec = tween(durationMillis = 200)
-                            )
+
+                        tryAwaitRelease()
+
+                        vibrationJob.cancel()
+
+                        if (pressProgress.value >= 0.98f) {
+                            isCompleted = true
+                            onCheckIn()
+                        } else {
+                            progressJob.cancel()
+                            scope.launch {
+                                pressProgress.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = tween(durationMillis = 200)
+                                )
+                            }
                         }
                     }
                 )
@@ -312,17 +469,19 @@ private fun SignInTab(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = logoIcon(size = 96f),
-            contentDescription = "Check In",
-            tint = iconColor,
+        CheckInLogo(
+            progress = if (checkedInToday) 1f else pressProgress.value,
             modifier = Modifier.size(96.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = if (checkedInToday) "今日已签到" else "长按签到",
+            text = when {
+                checkedInToday -> "今日已签到"
+                isCompleted -> "签到成功"
+                else -> "长按签到"
+            },
             style = MaterialTheme.typography.bodyMedium.copy(
-                color = if (checkedInToday) DimWhite else LifeRed,
+                color = if (checkedInToday || isCompleted) LifeRed else MutedWhite,
                 fontSize = 14.sp
             )
         )
