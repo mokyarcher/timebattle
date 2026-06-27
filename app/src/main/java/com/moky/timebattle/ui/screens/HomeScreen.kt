@@ -224,6 +224,10 @@ private fun HomeContent(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "topSpacerHeight"
         ) { if (it) 0.dp else 6.dp }
+        val labelHeight by timerTransition.animateDp(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "labelHeight"
+        ) { if (it) 0.dp else 24.dp }
         val subtitleOffsetY by timerTransition.animateDp(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "subtitleOffsetY"
@@ -256,6 +260,8 @@ private fun HomeContent(
         ) {
             Box(
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .height(labelHeight)
                     .alpha(titleAlpha)
                     .offset { IntOffset(0, titleOffsetY.roundToPx()) },
                 contentAlignment = Alignment.Center
