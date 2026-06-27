@@ -28,49 +28,50 @@ import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moky.timebattle.data.AppViewModel
 import com.moky.timebattle.data.model.AppState
-import com.moky.timebattle.data.model.TaskStatus
 import com.moky.timebattle.data.model.User
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import com.moky.timebattle.data.model.formatAsLifeTime
 import com.moky.timebattle.data.model.formatCompact
-import com.moky.timebattle.data.model.formatReward
-import com.moky.timebattle.ui.components.InProgressItem
 import com.moky.timebattle.ui.components.SectionLabel
 import com.moky.timebattle.ui.components.TimerBar
 import com.moky.timebattle.ui.components.icons.bellIcon
 import com.moky.timebattle.ui.components.icons.groupIcon
+import com.moky.timebattle.ui.components.icons.logoIcon
 import com.moky.timebattle.ui.components.icons.syncIcon
-import com.moky.timebattle.ui.components.icons.userIcon
 import com.moky.timebattle.ui.theme.AbyssBlack
+import com.moky.timebattle.ui.theme.CarbonGrey
 import com.moky.timebattle.ui.theme.DeepGrey
 import com.moky.timebattle.ui.theme.DimWhite
 import com.moky.timebattle.ui.theme.LifeRed
 import com.moky.timebattle.ui.theme.MutedWhite
+import com.moky.timebattle.ui.theme.StrokeLight
 import com.moky.timebattle.ui.theme.StrokeRed
 import com.moky.timebattle.ui.theme.TimebattleTheme
 import com.moky.timebattle.ui.theme.TimerDigitsStyle
 import com.moky.timebattle.util.VibrationHelper
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+private val tabs = listOf("签到", "同步", "联盟")
 
 @Composable
 fun HomeScreen(
     viewModel: AppViewModel,
     onShowMessage: (String) -> Unit,
-    onTaskClick: (String) -> Unit,
     onNavigateToNotifications: () -> Unit,
-    onNavigateToAlliance: () -> Unit,
-    onNavigateToSync: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -86,14 +87,7 @@ fun HomeScreen(
                 onShowMessage("今日已签到")
             }
         },
-        onTaskClick = { taskId ->
-            viewModel.completeTask(taskId)
-            VibrationHelper.vibrateSuccess(context)
-            onShowMessage("任务完成，奖励已到账")
-        },
         onNavigateToNotifications = onNavigateToNotifications,
-        onNavigateToAlliance = onNavigateToAlliance,
-        onNavigateToSync = onNavigateToSync,
         modifier = modifier
     )
 }
@@ -102,10 +96,7 @@ fun HomeScreen(
 private fun HomeContent(
     state: AppState,
     onCheckIn: () -> Unit,
-    onTaskClick: (String) -> Unit,
     onNavigateToNotifications: () -> Unit,
-    onNavigateToAlliance: () -> Unit,
-    onNavigateToSync: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val user = state.user
@@ -116,6 +107,8 @@ private fun HomeContent(
         animationSpec = tween(durationMillis = 1000, easing = LinearEasing),
         label = "timerProgress"
     )
+
+    var selectedTab by remember { mutableStateOf(0) }
 
     Column(
         modifier = modifier
@@ -175,7 +168,7 @@ private fun HomeContent(
                 .border(1.dp, StrokeRed, RoundedCornerShape(18.dp))
                 .background(
                     Brush.linearGradient(
-                        colors = listOf(LifeRed.copy(alpha = 0.03f), androidx.compose.ui.graphics.Color.Transparent),
+                        colors = listOf(LifeRed.copy(alpha = 0.03f), Color.Transparent),
                         start = androidx.compose.ui.geometry.Offset(0f, 0f),
                         end = androidx.compose.ui.geometry.Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
                     ),
@@ -210,7 +203,7 @@ private fun HomeContent(
             TimerBar(progress = progress)
         }
 
-        // Actions
+        // Tab bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -219,85 +212,138 @@ private fun HomeContent(
                 .clip(RoundedCornerShape(14.dp)),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ActionItem(
-                modifier = Modifier.weight(1f),
-                icon = { Icon(userIcon(), null, tint = MutedWhite, modifier = Modifier.size(20.dp)) },
-                label = "签到",
-                onClick = onCheckIn
-            )
-            ActionItem(
-                modifier = Modifier.weight(1f),
-                icon = { Icon(syncIcon(), null, tint = MutedWhite, modifier = Modifier.size(20.dp)) },
-                label = "同步",
-                onClick = onNavigateToSync
-            )
-            ActionItem(
-                modifier = Modifier.weight(1f),
-                icon = { Icon(groupIcon(), null, tint = MutedWhite, modifier = Modifier.size(20.dp)) },
-                label = "联盟",
-                onClick = onNavigateToAlliance
-            )
-        }
-
-        // In progress
-        SectionLabel(
-            text = "in progress",
-            modifier = Modifier.padding(top = 22.dp, bottom = 8.dp)
-        )
-        val inProgressTasks = state.tasks.filter { it.status == TaskStatus.IN_PROGRESS }
-        if (inProgressTasks.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "暂无进行中的任务",
-                    style = MaterialTheme.typography.bodySmall.copy(color = DimWhite)
-                )
-            }
-        } else {
-            Column {
-                inProgressTasks.forEach { task ->
-                    InProgressItem(
-                        title = task.title,
-                        reward = task.rewardSeconds.formatReward(),
-                        isCompleted = false,
-                        onClick = { onTaskClick(task.id) }
+            tabs.forEachIndexed { index, title ->
+                val selected = selectedTab == index
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                        .background(if (selected) AbyssBlack else Color.Transparent)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = ripple(),
+                            onClick = { selectedTab = index }
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = if (selected) LifeRed else MutedWhite,
+                            fontSize = 13.sp
+                        )
                     )
                 }
             }
         }
+
+        // Tab content
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            when (selectedTab) {
+                0 -> SignInTab(
+                    lastCheckInDate = state.lastCheckInDate,
+                    onCheckIn = onCheckIn
+                )
+                1 -> SyncTab()
+                2 -> AllianceTab()
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
 @Composable
-private fun ActionItem(
-    icon: @Composable () -> Unit,
-    label: String,
-    onClick: () -> Unit,
+private fun SignInTab(
+    lastCheckInDate: String?,
+    onCheckIn: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val today = remember { LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) }
+    val checkedInToday = lastCheckInDate == today
+
     Column(
         modifier = modifier
+            .fillMaxWidth()
+            .background(CarbonGrey, RoundedCornerShape(14.dp))
+            .border(1.dp, StrokeLight, RoundedCornerShape(14.dp))
             .clickable(
+                enabled = !checkedInToday,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(),
-                onClick = onClick
+                onClick = onCheckIn
             )
-            .padding(vertical = 14.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(vertical = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        icon()
-        Spacer(modifier = Modifier.height(5.dp))
+        Icon(
+            imageVector = logoIcon(size = 96f),
+            contentDescription = "Check In",
+            tint = if (checkedInToday) MutedWhite else LifeRed,
+            modifier = Modifier.size(96.dp)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall.copy(
-                color = DimWhite,
-                fontSize = 9.sp,
-                letterSpacing = 0.5.sp
+            text = if (checkedInToday) "今日已签到" else "点击签到",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = if (checkedInToday) DimWhite else LifeRed,
+                fontSize = 14.sp
             )
+        )
+    }
+}
+
+@Composable
+private fun SyncTab(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(CarbonGrey, RoundedCornerShape(14.dp))
+            .border(1.dp, StrokeLight, RoundedCornerShape(14.dp))
+            .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = syncIcon(),
+            contentDescription = "Sync",
+            tint = LifeRed,
+            modifier = Modifier.size(40.dp)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "同步功能即将开放",
+            style = MaterialTheme.typography.bodyMedium.copy(color = MutedWhite)
+        )
+    }
+}
+
+@Composable
+private fun AllianceTab(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(CarbonGrey, RoundedCornerShape(14.dp))
+            .border(1.dp, StrokeLight, RoundedCornerShape(14.dp))
+            .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = groupIcon(),
+            contentDescription = "Alliance",
+            tint = LifeRed,
+            modifier = Modifier.size(40.dp)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "联盟功能即将开放",
+            style = MaterialTheme.typography.bodyMedium.copy(color = MutedWhite)
         )
     }
 }
@@ -309,10 +355,7 @@ private fun HomeContentPreview() {
         HomeContent(
             state = AppState(user = User(isLoggedIn = true)),
             onCheckIn = {},
-            onTaskClick = {},
-            onNavigateToNotifications = {},
-            onNavigateToAlliance = {},
-            onNavigateToSync = {}
+            onNavigateToNotifications = {}
         )
     }
 }
