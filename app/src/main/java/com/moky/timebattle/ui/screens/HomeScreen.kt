@@ -297,7 +297,9 @@ private fun HomeContent(
                         fontSize = 8.sp,
                         letterSpacing = 2.sp
                     ),
-                    modifier = Modifier.alpha(clockLabelAlpha)
+                    modifier = Modifier
+                        .alpha(clockLabelAlpha)
+                        .padding(top = 28.dp)
                 )
             }
 
