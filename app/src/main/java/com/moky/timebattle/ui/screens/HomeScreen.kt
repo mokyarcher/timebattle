@@ -192,6 +192,10 @@ private fun HomeContent(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "titleAlpha"
         ) { if (it) 0f else 1f }
+        val clockLabelAlpha by timerTransition.animateFloat(
+            transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
+            label = "clockLabelAlpha"
+        ) { if (it) 1f else 0f }
         val titleOffsetY by timerTransition.animateDp(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "titleOffsetY"
@@ -286,6 +290,15 @@ private fun HomeContent(
                 if (clockAlpha > 0f) {
                     DynamicClock(modifier = Modifier.size(180.dp))
                 }
+                Text(
+                    text = "REMAINING LIFE",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = MutedWhite,
+                        fontSize = 8.sp,
+                        letterSpacing = 2.sp
+                    ),
+                    modifier = Modifier.alpha(clockLabelAlpha)
+                )
             }
 
             Text(
