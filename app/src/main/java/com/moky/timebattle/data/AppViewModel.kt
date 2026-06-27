@@ -88,6 +88,12 @@ class AppViewModel(
         )
     )
 
+    private val quotes = listOf(
+        "TIME IS LIFE",
+        "TIME IS MONEY",
+        "TIME IS EVERYTHING"
+    )
+
     private fun startLifeTimer() {
         viewModelScope.launch {
             while (isActive) {
@@ -98,7 +104,20 @@ class AppViewModel(
                     } else {
                         val newRemaining = current.user.remainingSeconds - 1
                         val updatedUser = current.user.copy(remainingSeconds = newRemaining)
-                        val newState = current.copy(user = updatedUser)
+                        // Check if quote needs update (every hour)
+                        val now = System.currentTimeMillis()
+                        val oneHour = 60 * 60 * 1000L
+                        val (newQuoteIndex, newQuoteTime) = if (now - current.dailyQuoteUpdatedAt >= oneHour) {
+                            val nextIndex = (current.dailyQuoteIndex + 1) % quotes.size
+                            nextIndex to now
+                        } else {
+                            current.dailyQuoteIndex to current.dailyQuoteUpdatedAt
+                        }
+                        val newState = current.copy(
+                            user = updatedUser,
+                            dailyQuoteIndex = newQuoteIndex,
+                            dailyQuoteUpdatedAt = newQuoteTime
+                        )
                         storage.saveAppState(newState)
                         newState
                     }

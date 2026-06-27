@@ -3,10 +3,13 @@ package com.moky.timebattle.ui.screens
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateInt
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
@@ -132,6 +135,18 @@ private fun HomeContent(
         label = "timerProgress"
     )
 
+    // Colon blink animation: pulses every second
+    val blinkTransition = rememberInfiniteTransition(label = "colonBlink")
+    val colonAlpha by blinkTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(700, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "colonAlpha"
+    )
+
     var selectedTab by remember { mutableStateOf(0) }
 
     Column(
@@ -254,6 +269,7 @@ private fun HomeContent(
                     ),
                     RoundedCornerShape(18.dp)
                 )
+                .clip(RoundedCornerShape(18.dp))
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = ripple(),
@@ -291,43 +307,160 @@ private fun HomeContent(
                     DynamicClock(modifier = Modifier.size(180.dp))
                 }
                 Text(
-                    text = "REMAINING LIFE",
+                    text = "REMAINING\nLIFE",
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = MutedWhite,
                         fontSize = 8.sp,
-                        letterSpacing = 2.sp
+                        letterSpacing = 2.sp,
+                        textAlign = TextAlign.Center
                     ),
                     modifier = Modifier
                         .alpha(clockLabelAlpha)
-                        .padding(top = 28.dp)
+                        .padding(top = 36.dp)
                 )
             }
 
+            val total = user.remainingSeconds.coerceAtLeast(0)
+            val hours = total / 3600
+            val minutes = (total % 3600) / 60
+            val seconds = total % 60
+
+            val timeText = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            val labelStyle = MaterialTheme.typography.labelSmall.copy(
+                color = MutedWhite,
+                fontSize = 7.sp,
+                letterSpacing = 3.sp
+            )
+
+            if (showClockMode) {
+                // Clock mode: 3-column with relaxed spacing
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset { IntOffset(0, timeOffsetY.roundToPx()) }
+                        .scale(timeScale),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    val digitStyle = TimerDigitsStyle.copy(
+                        fontSize = timeFontSize.sp,
+                        color = LifeRed
+                    )
+                    // Hours
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = String.format("%02d", hours),
+                            style = digitStyle,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
+                        )
+                        Text("HOURS", style = labelStyle, modifier = Modifier.padding(top = 4.dp))
+                    }
+                    // Colon 1 with extra spacing
+                    Text(
+                        text = ":",
+                        style = digitStyle.copy(color = LifeRed.copy(alpha = colonAlpha)),
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                    // Minutes
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = String.format("%02d", minutes),
+                            style = digitStyle,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
+                        )
+                        Text("MINUTES", style = labelStyle, modifier = Modifier.padding(top = 4.dp))
+                    }
+                    // Colon 2 with extra spacing
+                    Text(
+                        text = ":",
+                        style = digitStyle.copy(color = LifeRed.copy(alpha = colonAlpha)),
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                    // Seconds
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = String.format("%02d", seconds),
+                            style = digitStyle,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
+                        )
+                        Text("SECONDS", style = labelStyle, modifier = Modifier.padding(top = 4.dp))
+                    }
+                }
+            } else {
+                // Numeric mode: precise 3-column alignment
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset { IntOffset(0, timeOffsetY.roundToPx()) }
+                        .scale(timeScale),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    val digitStyle = TimerDigitsStyle.copy(
+                        fontSize = timeFontSize.sp,
+                        color = LifeRed
+                    )
+                    // Hours block
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = String.format("%02d", hours),
+                            style = digitStyle,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
+                        )
+                        Text("HOURS", style = labelStyle, modifier = Modifier.padding(top = 4.dp))
+                    }
+                    // Colon 1
+                    Text(
+                        text = ":",
+                        style = digitStyle.copy(color = LifeRed.copy(alpha = colonAlpha)),
+                        modifier = Modifier.padding(horizontal = 2.dp)
+                    )
+                    // Minutes block
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = String.format("%02d", minutes),
+                            style = digitStyle,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
+                        )
+                        Text("MINUTES", style = labelStyle, modifier = Modifier.padding(top = 4.dp))
+                    }
+                    // Colon 2
+                    Text(
+                        text = ":",
+                        style = digitStyle.copy(color = LifeRed.copy(alpha = colonAlpha)),
+                        modifier = Modifier.padding(horizontal = 2.dp)
+                    )
+                    // Seconds block
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = String.format("%02d", seconds),
+                            style = digitStyle,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
+                        )
+                        Text("SECONDS", style = labelStyle, modifier = Modifier.padding(top = 4.dp))
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            val quotes = listOf("TIME IS LIFE", "TIME IS MONEY", "TIME IS EVERYTHING")
+            val quoteIndex = state.dailyQuoteIndex.coerceIn(0, quotes.size - 1)
             Text(
-                text = user.remainingSeconds.formatAsLifeTime(),
-                style = TimerDigitsStyle.copy(
-                    fontSize = timeFontSize.sp,
-                    color = LifeRed
+                text = quotes[quoteIndex],
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MutedWhite,
+                    fontSize = 11.sp,
+                    letterSpacing = 3.sp
                 ),
                 textAlign = TextAlign.Center,
-                maxLines = 1,
-                softWrap = false,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .offset { IntOffset(0, timeOffsetY.roundToPx()) }
-                    .scale(timeScale)
-                    .basicMarquee(
-                        iterations = Int.MAX_VALUE,
-                        animationMode = androidx.compose.foundation.MarqueeAnimationMode.Immediately,
-                        velocity = 38.dp,
-                        spacing = androidx.compose.foundation.MarqueeSpacing(24.dp)
-                    )
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "−1/min · today consumed ${(24 * 3600 - user.remainingSeconds.coerceAtMost(24 * 3600)).formatCompact()}",
-                style = MaterialTheme.typography.labelSmall.copy(color = DimWhite, fontSize = 8.sp),
-                modifier = Modifier.offset { IntOffset(0, subtitleOffsetY.roundToPx()) }
+                    .offset { IntOffset(0, subtitleOffsetY.roundToPx()) }
             )
         }
 

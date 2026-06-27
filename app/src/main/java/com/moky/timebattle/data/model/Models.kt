@@ -62,7 +62,9 @@ data class AppState(
     val totalTaskCount: Int = 0,
     val totalTradeCount: Int = 0,
     val reputationPoints: Int = 100, // 信誉点，交易用
-    val vibrationEnabled: Boolean = true
+    val vibrationEnabled: Boolean = true,
+    val dailyQuoteIndex: Int = 0,
+    val dailyQuoteUpdatedAt: Long = 0
 )
 
 fun Long.formatAsLifeTime(): String {
