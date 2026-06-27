@@ -207,7 +207,7 @@ private fun HomeContent(
         val timeOffsetY by timerTransition.animateDp(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "timeOffsetY"
-        ) { if (it) 190.dp else 0.dp }
+        ) { if (it) 8.dp else 0.dp }
         val clockAlpha by timerTransition.animateFloat(
             transitionSpec = { tween(600, easing = FastOutSlowInEasing) },
             label = "clockAlpha"
@@ -223,7 +223,7 @@ private fun HomeContent(
         val subtitleOffsetY by timerTransition.animateDp(
             transitionSpec = { tween(500, easing = FastOutSlowInEasing) },
             label = "subtitleOffsetY"
-        ) { if (it) 200.dp else 0.dp }
+        ) { if (it) 12.dp else 0.dp }
 
         Column(
             modifier = Modifier
